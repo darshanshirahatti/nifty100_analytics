@@ -1,0 +1,11 @@
+table_name,source_file,row_count,rejected_rows
+companies,companies.xlsx,92,0
+profitandloss,profitandloss.xlsx,1263,0
+balancesheet,balancesheet.xlsx,1225,0
+cashflow,cashflow.xlsx,1164,0
+analysis,analysis.xlsx,5,0
+documents,documents.xlsx,1584,0
+prosandcons,prosandcons.xlsx,16,0
+sectors,sectors.xlsx,92,0
+stock_prices,stock_prices.xlsx,5520,0
+financial_ratios,financial_ratios.xlsx,1065,0

@@ -1,0 +1,10 @@
+# Data Manipulation & File Parsing
+pandas>=1.3.5
+openpyxl>=3.0.9
+numpy>=1.21.0
+
+# User Interface & Data Quality Dashboard
+streamlit>=1.10.0
+
+# Quality Assurance & Pipeline Testing
+pytest>=7.0.0
