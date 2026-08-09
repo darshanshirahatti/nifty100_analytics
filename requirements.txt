@@ -1,7 +1,8 @@
 # Data Manipulation & File Parsing
-pandas>=1.3.5
+pandas>=1.4.0
+numpy>=1.22.0
 openpyxl>=3.0.9
-numpy>=1.21.0
+
 
 # User Interface & Data Quality Dashboard
 streamlit>=1.10.0
