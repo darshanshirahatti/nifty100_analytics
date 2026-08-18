@@ -162,7 +162,7 @@ def run_screener():
                     cell.fill = green_fill if is_passing else red_fill
 
     wb.save(OUTPUT_PATH)
-    print(f"🎯 Screener calculations completed! Results saved to '{OUTPUT_PATH}'")
+    print(f"[Screener] Calculations completed! Results saved to '{OUTPUT_PATH}'")
 
 if __name__ == "__main__":
     run_screener()

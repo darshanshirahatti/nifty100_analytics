@@ -1,35 +1,28 @@
-# Virtual Environments
+# Python virtual environments
 .venv/
 venv/
 env/
-.env
-.env.local
-.env.*.local
+ENV/
 
-# Python
+# Python bytecode and build artifacts
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
+*.pyo
+*.pyd
 *.egg-info/
-.installed.cfg
+.eggs/
+build/
+dist/
 *.egg
-PIPFILE.lock
+.Python
+pip-wheel-metadata/
 
-# IDE & Editors
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE / editor settings
 .vscode/
 .idea/
 *.swp
@@ -37,105 +30,91 @@ PIPFILE.lock
 *~
 .DS_Store
 Thumbs.db
-*.sublime-workspace
-*.sublime-project
-.pylintrc
-.mypy_cache/
-.dmypy.json
-dmypy.json
 
-# Testing & Coverage
+# Test and coverage outputs
 .pytest_cache/
 .coverage
 .coverage.*
 htmlcov/
 .tox/
-.hypothesis/
 .nox/
 coverage.xml
 *.cover
-reports/pytest_report.html
+reports/
+!reports/.gitkeep
+*.html
 test-results.xml
 .testmon.db
 
-# Jupyter Notebook
-.ipynb_checkpoints
+# Jupyter / notebooks
+.ipynb_checkpoints/
 *.ipynb
 
-# Database Files
+# Database files
 *.db
 *.sqlite
 *.sqlite3
-data/nifty100.db
+!db/schema.sql
 
-# Project-specific outputs (keep structure, ignore generated files)
-output/validation_failures.csv
-output/load_audit.csv
+data/
+!data/raw/
+!data/raw/**
+
+# Generated docs and exported deliverables
+docs/
+!docs/.gitkeep
+*.pdf
+
+# Project output folders and generated artifacts
+output/
+!output/.gitkeep
+output/final_deliverables/
+output/*.csv
 output/*.xlsx
 output/*.log
-output/cluster_*.csv
-output/distress_*.csv
-output/outlier_*.csv
-output/portfolio_*.csv
-output/pros_cons_*.csv
-output/skipped_*.csv
-output/valuation_*.csv
-reports/radar_charts/*.png
-reports/sector/*.png
-reports/portfolio/*.png
-reports/tearsheets/*.pdf
+output/*.json
+output/*.html
+
+reports/radar_charts/
+reports/sector/
+reports/portfolio/
+reports/tearsheets/
+
 src/analytics/output/
 src/etl/data/
 src/etl/output/
 src/nlp/output/
 
-# Logs
+# Archive and packaging files
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+
+# Logs and temp files
 *.log
 logs/
+*.tmp
+*.bak
+*.backup
+*.bkp
+.tmp/
 
-# API/Framework
+# Streamlit / framework local secrets
 .streamlit/secrets.toml
 .streamlit/cache/
 .streamlit/.cache/
 .uvicorn.sock
 *.sock
 
-# OS Files
-.DS_Store
-Thumbs.db
-*.lnk
-
-# Local configuration
+# Local config overrides
 config/local.yaml
 config/secrets.yaml
 
-# Temporary files
-*.tmp
-*.bak
-*.swp
-*.swo
-*~
-.tmp/
-
-# IDEs temporary storage
-.vscode/settings.json
-.vscode/launch.json
-.idea/workspace.xml
-.idea/tasks.xml
-
-# Node modules (if any frontend build tools used)
+# Node tooling (if introduced later)
 node_modules/
-npm-debug.log
+npm-debug.log*
 
-# Environment-specific
-.env.*
-!.env.example
-
-# Large files
-*.zip
-*.tar.gz
-*.rar
-
-# Backup files
-*.backup
-*.bkp
+# OS-specific junk
+*.lnk

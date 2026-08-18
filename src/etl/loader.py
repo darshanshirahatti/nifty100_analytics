@@ -136,7 +136,7 @@ def run_pipeline():
     df_audit = pd.DataFrame(audit_trail)
     df_audit.to_csv(os.path.join(OUTPUT_DIR, "load_audit.csv"), index=False)
     validator.export_failures()
-    print("✨ ETL Pipeline completed. Audit logs exported to output/ directories.")
+    print("[ETL] Pipeline completed. Audit logs exported to output/ directories.")
 
 if __name__ == "__main__":
     run_pipeline()

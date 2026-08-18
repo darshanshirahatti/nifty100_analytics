@@ -88,7 +88,7 @@ def compute_peer_percentiles():
     else:
         peer_col = columns[1] if len(columns) > 1 else "company_id"
 
-    print(f"🎯 Using column '{peer_col}' as 'peer_group'")
+    print(f"[Peer Analysis] Using column '{peer_col}' as 'peer_group'")
     peer_mapping = pd.read_sql_query(f"SELECT company_id, {peer_col} AS peer_group FROM sectors", conn)
 
     # Safely merge mapping to establish the complete base DataFrame 'm_df'
