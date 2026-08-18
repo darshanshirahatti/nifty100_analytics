@@ -6,12 +6,11 @@ import pandas as pd
 from ratios import *
 from cagr import compute_cagr
 from cashflow_kpis import compute_fcf, classify_capital_allocation, classify_capex_intensity
+from ..config import DB_PATH, OUTPUT_DIR
 
-# Robust directory-agnostic path system
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-DB_PATH = os.path.join(BASE_DIR, "data", "nifty100.db")
-LOG_PATH = os.path.join(BASE_DIR, "output", "ratio_edge_cases.log")
-CSV_PATH = os.path.join(BASE_DIR, "output", "capital_allocation.csv")
+# Output paths
+LOG_PATH = os.path.join(OUTPUT_DIR, "ratio_edge_cases.log")
+CSV_PATH = os.path.join(OUTPUT_DIR, "capital_allocation.csv")
 
 def recreate_financial_ratios_table(conn):
     """

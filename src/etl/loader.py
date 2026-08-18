@@ -1,15 +1,13 @@
 import os
 import sqlite3
 import pandas as pd
-from normaliser import normalize_ticker, normalize_year
-from validator import DataValidator
-
-DB_PATH = "data/nifty100.db"
-SCHEMA_PATH = "db/schema.sql"
+from .normaliser import normalize_ticker, normalize_year
+from .validator import DataValidator
+from ..config import DB_PATH, SCHEMA_PATH, OUTPUT_DIR
 
 def init_db():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    os.makedirs("output", exist_ok=True)
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     with open(SCHEMA_PATH, 'r') as f:
         conn.executescript(f.read())
@@ -21,8 +19,8 @@ def populate_table(table_name: str, excel_file_name: str, is_core: bool = True):
     Reads local raw spreadsheets, runs structural cleaning logic,
     evaluates validators, and posts changes into target records.
     """
-    base_data_dir = "data/raw/"
-    file_path = os.path.join(base_data_dir, excel_file_name)
+    from ..config import RAW_DATA_DIR
+    file_path = os.path.join(RAW_DATA_DIR, excel_file_name)
     
     if not os.path.exists(file_path):
         print(f"File skipped: {excel_file_name} not located.")
@@ -136,7 +134,7 @@ def run_pipeline():
 
     # Finalize Handoff Logs
     df_audit = pd.DataFrame(audit_trail)
-    df_audit.to_csv("output/load_audit.csv", index=False)
+    df_audit.to_csv(os.path.join(OUTPUT_DIR, "load_audit.csv"), index=False)
     validator.export_failures()
     print("✨ ETL Pipeline completed. Audit logs exported to output/ directories.")
 

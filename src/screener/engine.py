@@ -7,12 +7,11 @@ import numpy as np
 import pandas as pd
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font, Alignment
+from ..config import DB_PATH, OUTPUT_DIR
 
-# Robust directory paths
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-DB_PATH = os.path.join(BASE_DIR, "data", "nifty100.db")
-CONFIG_PATH = os.path.join(BASE_DIR, "config", "screener_config.yaml")
-OUTPUT_PATH = os.path.join(BASE_DIR, "output", "screener_output.xlsx")
+# Configuration and output paths
+CONFIG_PATH = os.path.join(os.path.dirname(DB_PATH), "..", "config", "screener_config.yaml")
+OUTPUT_PATH = os.path.join(OUTPUT_DIR, "screener_output.xlsx")
 
 def winsorise_and_scale(series, p_low=10, p_high=90):
     """Caps extreme values at specified percentiles and scales them linearly between 0 and 100."""

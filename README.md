@@ -84,6 +84,7 @@ nifty100_analytics/
 │     └─ <company>_radar.png
 ├─ src/
 │  ├─ __init__.py
+│  ├─ config.py                # Centralized configuration (DB paths, etc.)
 │  ├─ analytics/
 │  │  ├─ __init__.py
 │  │  ├─ cagr.py
@@ -92,6 +93,20 @@ nifty100_analytics/
 │  │  ├─ populate_ratios.py
 │  │  ├─ ratios.py
 │  │  └─ valuation.py
+│  ├─ api/
+│  │  ├─ main.py               # FastAPI app with CORS & logging middleware
+│  │  ├─ database.py           # Database utilities
+│  │  ├─ docs/
+│  │  │  └─ openapi.json
+│  │  └─ routers/
+│  │     ├─ companies.py       # Companies endpoint with sector joins
+│  │     ├─ documents.py
+│  │     ├─ health.py
+│  │     ├─ peers.py
+│  │     ├─ portfolio.py
+│  │     ├─ screener.py
+│  │     ├─ sectors.py
+│  │     └─ valuation.py
 │  ├─ dashboard/
 │  │  ├─ __init__.py
 │  │  ├─ app.py
@@ -102,16 +117,26 @@ nifty100_analytics/
 │  │     └─ qa_test.py
 │  ├─ etl/
 │  │  ├─ __init__.py
-│  │  ├─ loader.py
+│  │  ├─ loader.py             # Uses shared config DB path
 │  │  ├─ normaliser.py
 │  │  └─ validator.py
-│  ├─ screener/
-│  │  ├─ __init__.py
-│  │  └─ engine.py
+│  ├─ nlp/
+│  │  ├─ database.py           # Uses shared config DB path
+│  │  ├─ parser.py
+│  │  └─ pros_cons_generator.py
+│  └─ screener/
+│     ├─ __init__.py
+│     └─ engine.py             # Uses shared config DB path
 ├─ tests/
-│  ├─ __init__.py
+│  ├─ api/
+│  │  ├─ test_companies.py     # Company endpoint tests
+│  │  ├─ test_screener.py      # Screener validation tests
+│  │  └─ test_health.py        # Health check tests
+│  ├─ dq/
+│  │  └─ test_rules.py         # Data quality rule validations (RULE_01-08+)
 │  ├─ etl/
 │  │  ├─ __init__.py
+│  │  ├─ test_loader.py
 │  │  ├─ test_normaliser.py
 │  │  └─ test_validator.py
 │  └─ kpi/
@@ -215,12 +240,45 @@ Execute the full test suite:
 pytest
 ```
 
-Or run specific suites:
+Or run specific test categories:
 
 ```bash
-pytest tests/kpi/          # CAGR & ratio calculations
-pytest tests/etl/          # normaliser & validator logic
+pytest tests/api/          # FastAPI endpoint tests (3 tests)
+pytest tests/dq/           # Data quality rule validations (14 tests)
+pytest tests/etl/          # ETL pipeline tests (11 tests)
+pytest tests/kpi/          # CAGR & ratio calculations (27 tests)
 ```
+
+Generate HTML test report:
+
+```bash
+pytest tests/ --html=reports/pytest_report.html --self-contained-html -v
+```
+
+**Test Status:** ✅ **55/55 PASSING**
+
+### Test Suites
+
+#### API Tests (3 tests)
+- `test_companies.py` — Company list & detail retrieval endpoints with sector data
+- `test_screener.py` — Screener filter validation & parameter checks
+- `test_health.py` — API health check endpoint with table statistics
+
+#### Data Quality Tests (14 tests)
+- `test_rules.py` — DQ validation rules (RULE_01 through RULE_14):
+  - RULE_01-02: Negative debt/revenue detection
+  - RULE_03-04: ROE bounds & current ratio validation
+  - RULE_05-06: Interest coverage & operating margin checks
+  - RULE_07: Missing company ID detection
+  - RULE_08-14: Asset turnover, dividend yield, NPM, D/E, FCF, year, promoter holding
+
+#### ETL Tests (11 tests)
+- Company, financial, and CSV file loading tests
+
+#### KPI Tests (27 tests)
+- CAGR calculations (turnaround, decline, normal cases)
+- ROE, D/E, ICR, asset turnover calculations
+- Edge case handling
 
 ---
 
@@ -238,18 +296,107 @@ pytest tests/etl/          # normaliser & validator logic
 
 ---
 
-## 🗄️ Database Schema
+## 🗄️ Database
 
-SQLite database (`data/nifty100.db`) with 11 tables defined in `db/schema.sql`:
+SQLite database (`data/nifty100.db`) with centralized path configuration in `src/config.py`.
 
+**Key Features:**
+- Single source of truth for all database paths (ETL, API, Analytics, Tests)
+- Ensures all modules access the same database file
+- Absolute path resolution for cross-module compatibility
+
+**11-Table Schema:**
 `companies`, `profitandloss`, `balancesheet`, `cashflow`, `analysis`, `documents`, `prosandcons`, `sectors`, `stock_prices`, `financial_ratios`, `peer_groups`.
+
+**Column Naming Convention:**
+- Primary IDs: `id` (companies), `company_id` (all other tables)
+- KPIs: `return_on_equity_pct`, `roce_percentage`, `debt_to_equity`, etc.
+- Temporal: `year` (YYYY-MM format)
+- Sector Data: `broad_sector`, `sub_sector`, `market_cap_category`
+
+---
+
+## � API Endpoints
+
+A production-grade FastAPI backend is available at `src/api/main.py` with the following features:
+
+### Middleware
+- **CORS** — Enabled for all origins (internal use)
+- **Request Logging** — Logs method, path, duration, and status code
+- **SQLite Connection Pool** — Efficient database access
+
+### Router Modules (`/api/v1`)
+- `/companies` — Query company fundamentals, detailed profiles
+- `/screener` — Execute stock screener with custom filters & validation
+- `/peers` — Peer benchmarking and percentile rankings
+- `/sectors` — Sector-level aggregations and statistics
+- `/portfolio` — Portfolio analysis and performance metrics
+- `/valuation` — Valuation flags, P/E, P/B summaries
+- `/documents` — Annual reports and BSE filing browser
+- `/health` — Service health check
+
+Start the API server:
+```bash
+cd src/api && uvicorn main:app --reload
+```
+
+API documentation:
+- **Interactive Docs:** `http://localhost:8000/docs` (Swagger UI)
+- **ReDoc:** `http://localhost:8000/redoc`
+- **OpenAPI Schema:** `src/api/docs/openapi.json`
 
 ---
 
 ## 📝 Notes
 
-- `src/etl/*` handles data cleaning, validation, and loading.
-- `src/analytics/*` computes KPIs, ratios, CAGR, capital allocation, and peer analytics.
-- `src/screener/engine.py` orchestrates the config-driven screener pipeline.
-- `src/dashboard/` contains the Streamlit app and its shared utilities (`db.py`, `peer_analysis.py`, `qa_test.py`).
-- Data files are loaded from `data/raw/`; the dashboard caches queries for 10 minutes via `st.cache_data`.
+- `src/config.py` provides centralized path configuration for all modules
+- `src/etl/*` handles data cleaning, validation, and loading
+- `src/analytics/*` computes KPIs, ratios, CAGR, capital allocation, and peer analytics
+- `src/screener/engine.py` orchestrates the config-driven screener pipeline
+- `src/api/` provides FastAPI endpoints with CORS & request logging middleware
+- `src/nlp/` handles pros & cons parsing and generation
+- `src/dashboard/` contains the Streamlit app and shared utilities
+- Data files are loaded from `data/raw/`; the dashboard caches queries for 10 minutes via `st.cache_data`
+- All database connections use the centralized `DB_PATH` from `src/config.py`
+
+---
+
+## 📋 Requirements
+
+- **Python 3.8+**
+- **pip** or **conda**
+- **SQLite3** (usually included)
+- Excel files in `data/raw/` (sample structure in documentation)
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Make your changes and write tests
+4. Run `pytest` to ensure all tests pass
+5. Commit your changes: `git commit -am 'Add your feature'`
+6. Push to the branch: `git push origin feature/your-feature`
+7. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License — see LICENSE file for details.
+
+---
+
+## 💬 Support & Contact
+
+For issues, questions, or suggestions:
+- Open an [issue](../../issues) on GitHub
+- Submit a [pull request](../../pulls) with improvements
+- Contact the maintainers through the repository
+
+---
+
+## 🙏 Acknowledgments
+
+Built with ❤️ for institutional-grade equity research on the Nifty 100 universe.

@@ -7,12 +7,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font, Alignment
+from ..config import DB_PATH, OUTPUT_DIR
 
-# Robust directory paths
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-DB_PATH = os.path.join(BASE_DIR, "data", "nifty100.db")
-PEER_OUT_PATH = os.path.join(BASE_DIR, "output", "peer_comparison.xlsx")
-RADAR_DIR = os.path.join(BASE_DIR, "reports", "radar_charts")
+# Output paths
+PEER_OUT_PATH = os.path.join(OUTPUT_DIR, "peer_comparison.xlsx")
+RADAR_DIR = os.path.join(OUTPUT_DIR, "../reports/radar_charts")
 
 def setup_peer_tables(conn):
     """Initializes the output table in SQLite."""
